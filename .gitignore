@@ -130,3 +130,5 @@ dmypy.json
 
 # Terraform files
 *terraform*
+modules/.env
+modules/variables.tf

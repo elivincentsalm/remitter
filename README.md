@@ -1,2 +1,2 @@
-# case-o
-case-o: Automating Covert and Resilient C2 Infrastructure Deployments
+# remitter
+remitter: Automating Covert and Resilient C2 Infrastructure Deployments
