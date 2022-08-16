@@ -1,0 +1,6 @@
+[commandserver]
+name = "Botnet Redirector"
+host = 192.168.1.1
+user = "webmaster"
+ssh_key = "./path/to/pem"
+protocol = "HTTP"

@@ -1,0 +1,38 @@
+[aws]
+access_token = ACCESS_TOKEN
+
+[teamserver]
+name = "Teamserver"
+
+[commandserver]
+name = "Long Haul DNS C2"
+protocol = "DNS"
+profile = "./profiles/c2/dns/basic.prof"
+amount = 2
+
+[commandserver]
+name = "Short Haul HTTP C2"
+protocol = "HTTP"
+profile = "./profiles/c2/http/basic.prof"
+amount = 5
+
+[phishing]
+name = "HTTP Phishing, cred capture"
+protocol = "HTTP"
+profile = "./profiles/c2/http/credcapture.prof"
+amount = 1
+whitelist_ip = [192.168.1.0/24]
+
+[phishing] // auto generate self-signed cert
+name = "SMTP Phishing"
+protocol = "SMTPS"
+profile = "./profiles/phishing/smtp/basic.prof"
+amount = 3
+
+[payload]
+name = "Payload server"
+protocol = "HTTPS"
+cert = "./path/to/cert"
+domain = "www.fakedoma.in"
+profile = "./profiles/c2/http/basic.prof"
+amount = 5
