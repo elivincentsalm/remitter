@@ -8,19 +8,38 @@ data "external" "get_public_ip" {
   program = ["bash", "../../scripts/get_public_ip.sh" ]
 }
 
-resource "aws_key_pair" "pub_key" {
-  key_name = "pub_key"
-  public_key = file("/users/elisalm/documents/remitter/keys/id_rsa.pub")
+resource "aws_key_pair" "ssh_key" {
+  key_name = "ssh_key"
+  public_key = file("/Users/elisalm/Documents/remitter/keys/id_rsa.pub")
 }
 
 resource "aws_instance" "http-redir" {
   ami = "ami-052efd3df9dad4825"
   instance_type = "t2.micro"
-  key_name = aws_key_pair.pub_key.key_name
+  key_name = aws_key_pair.ssh_key.key_name
 
-  provisioner "local-exec" {
-    command = "ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i playbooks/hosts -u ubuntu playbooks/setup.yml"
+  user_data = <<EOF
+#!/bin/bash
+sudo apt-get update -y
+sudo apt-get install -y apache2
+echo "<h1>Deployed via Terraform</h1>" | sudo tee /var/www/html/index.html
+sudo a2enmod rewrite proxy proxy_http
+sudo sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
+sudo systemctl start apache2
+sudo systemctl enable apache2
+  EOF
+  
+  /*
+  provisioner "file" {
+    source = "./files/apache2.conf"
+    destination = "/etc/apache2/apache2.conf"
   }
+
+  provisioner "file" {
+    source = "./files/.htaccess"
+    destination = "/var/www/html/.htaccess"
+  }
+  */
 
 }
 
