@@ -1,0 +1,5 @@
+RewriteEngine on
+
+RewriteRule ^\.htaccess - [L,R=404]
+RewriteCond %{REQUEST_URI} ^/redirect$ [NC]
+RewriteRule ^.*$ http://www.example.org/? [P]
