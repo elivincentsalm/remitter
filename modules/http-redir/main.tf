@@ -20,13 +20,33 @@ resource "aws_instance" "http-redir" {
   key_name = aws_key_pair.pub_key.key_name  // adding private key
 
   // runs ansible playbook to set up
-  provisioner "local-exec" {
-    command = "ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i playbooks/hosts -u ubuntu playbooks/setup.yml"
-  }
 }
 
 // attach the security group
 resource "aws_network_interface_sg_attachment" "sg_attachment" {
   security_group_id    = aws_security_group.http-redir-sg.id
   network_interface_id = aws_instance.http-redir.primary_network_interface_id
+}
+
+// create new ansible config and trigger execution of playbook
+data "template_file" "hosts" {
+  template = "${file("${path.module}/templates/hosts.tpl")}"
+  depends_on = [
+    aws_instance.http-redir,
+  ]
+  vars = {
+    ip = "${aws_instance.http-redir.public_ip}"
+  }
+}
+
+resource "null_resource" "hosts" {
+  triggers = {
+    template_rendered = "${data.template_file.hosts.rendered}"
+  }
+  provisioner "local-exec" {
+    command = "echo '${data.template_file.hosts.rendered}' > playbooks/hosts"
+  }
+  provisioner "local-exec" {
+    command = "sleep 30 && ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i playbooks/hosts -u ubuntu playbooks/setup.yml"
+  }
 }
