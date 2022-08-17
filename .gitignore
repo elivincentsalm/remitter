@@ -135,3 +135,5 @@ modules/variables.tf
 
 keys/*
 keys
+
+notes.txt
