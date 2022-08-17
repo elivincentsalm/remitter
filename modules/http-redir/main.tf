@@ -4,10 +4,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-data "external" "get_public_ip" {
-  program = ["bash", "../../scripts/get_public_ip.sh" ]
-}
-
 resource "aws_key_pair" "pub_key" {
   key_name = "pub_key"
   public_key = file("/users/elisalm/documents/remitter/keys/id_rsa.pub")
