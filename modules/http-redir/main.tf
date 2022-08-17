@@ -13,46 +13,19 @@ resource "aws_key_pair" "pub_key" {
   public_key = file("/users/elisalm/documents/remitter/keys/id_rsa.pub")
 }
 
+// create the redirector instance
 resource "aws_instance" "http-redir" {
-  ami = "ami-052efd3df9dad4825"
+  ami = "ami-052efd3df9dad4825"             // ubuntu 22.04
   instance_type = "t2.micro"
-  key_name = aws_key_pair.pub_key.key_name
+  key_name = aws_key_pair.pub_key.key_name  // adding private key
 
+  // runs ansible playbook to set up
   provisioner "local-exec" {
     command = "ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i playbooks/hosts -u ubuntu playbooks/setup.yml"
   }
-
 }
 
-resource "aws_security_group" "http-redir-sg" {
-  name = "http-redir-sg"
-
-  ingress = [
-    {
-      description = "Allow SSH from home"
-      from_port = 22
-      to_port = 22
-      protocol = "tcp"
-      // cidr_blocks = ["${data.external.get_public_ip.result["ip"]}/32"]
-      cidr_blocks = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = []
-      prefix_list_ids = []
-      security_groups = []
-      self = false
-    }, {
-      description = "Allow HTTP from ALL"
-      from_port = 80
-      to_port = 80
-      protocol = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = []
-      prefix_list_ids = []
-      security_groups = []
-      self = false
-    }
-  ]
-}
-
+// attach the security group
 resource "aws_network_interface_sg_attachment" "sg_attachment" {
   security_group_id    = aws_security_group.http-redir-sg.id
   network_interface_id = aws_instance.http-redir.primary_network_interface_id
