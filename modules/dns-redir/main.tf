@@ -10,28 +10,20 @@ resource "aws_key_pair" "pub_key" {
 }
 
 // create the redirector instance
-resource "aws_instance" "http-redir" {
-  ami = "ami-052efd3df9dad4825"             // ubuntu 22.04
+resource "aws_instance" "dns-redir" {
+  ami = "ami-052efd3df9dad4825"             // ubuntu 22.04 LTS
   instance_type = "t2.micro"
   key_name = aws_key_pair.pub_key.key_name  // adding private key
-
-  // runs ansible playbook to set up
-}
-
-// attach the security group
-resource "aws_network_interface_sg_attachment" "sg_attachment" {
-  security_group_id    = aws_security_group.http-redir-sg.id
-  network_interface_id = aws_instance.http-redir.primary_network_interface_id
 }
 
 // create new ansible config and trigger execution of playbook
 data "template_file" "hosts" {
   template = "${file("${path.module}/templates/hosts.tpl")}"
   depends_on = [
-    aws_instance.http-redir,
+    aws_instance.dns-redir,
   ]
   vars = {
-    ip = "${aws_instance.http-redir.public_ip}"
+    ip = "${aws_instance.dns-redir.public_ip}"
   }
 }
 

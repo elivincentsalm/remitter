@@ -1,0 +1,14 @@
+[Unit]
+Description=DNS Redirector service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/usr/bin/socat -T 1 udp4-listen:53,fork udp4-sendto:8.8.8.8:53
+
+[Install]
+WantedBy=multi-user.target

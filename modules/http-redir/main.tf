@@ -14,14 +14,6 @@ resource "aws_instance" "http-redir" {
   ami = "ami-052efd3df9dad4825"             // ubuntu 22.04
   instance_type = "t2.micro"
   key_name = aws_key_pair.pub_key.key_name  // adding private key
-
-  // runs ansible playbook to set up
-}
-
-// attach the security group
-resource "aws_network_interface_sg_attachment" "sg_attachment" {
-  security_group_id    = aws_security_group.http-redir-sg.id
-  network_interface_id = aws_instance.http-redir.primary_network_interface_id
 }
 
 // create new ansible config and trigger execution of playbook
