@@ -1,5 +1,5 @@
 # remitter: Automating Covert and Resilient C2 Infrastructure Deployments
-Remitter is a web GUI application which assists with automating deployments of covert C2 infrastructure. Remitter is designed to be extremely easy to configure for teams lacking domain-knowledge and includes many considerations for teams with high compliance/audit requirements.
+Remitter is a web GUI built to automate deployments of covert C2 infrastructure. Remitter is designed to be extremely easy to configure for teams lacking domain-knowledge and includes many considerations for teams with high compliance/audit requirements.
 
 <img width="1385" alt="MaximalC2Infra" src="https://user-images.githubusercontent.com/55160090/185763146-ad4a336a-7311-4201-9d93-78037c2b7149.png">
 
@@ -8,11 +8,12 @@ Remitter is a web GUI application which assists with automating deployments of c
 The above system diagram shows the "maximal" C2 infrastructure that can be created with Remitter. Maximal, meaning meant to display the full capabilities and complexity of Remitter. Components can be removed as desired in configuration settings to reduce complexity, cost, and/or realism. Below contains the rationale for each component in the above system diagram. 
 
 ### Victim Network
-Remitter is not an implant generation framework, though it is designed to be flexible to accomodate handing
+Remitter is not an implant generation framework, though it is designed to be flexible to accomodate different types of implant traffic.
 
 ### Internet, Mesh Overlay VPN
 
 #### Redirector Layer
+Redirectors are simple devices that forward traffic downstream towards the attack infrastructure using IPTables. Their purpose is to conceal the location of the attack infrastructure from analysts and scanners monitoring inbound/outbound network traffic. If a redirector is discovered, it can easily be torn down (for instance) and replaced without compromising the entire operation.
 
 #### Laundry Layer
 
