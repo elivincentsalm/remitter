@@ -18,7 +18,7 @@ In a maximal setup, each redirector would have it's own domain name and traffic/
 ##### www[.]somedomain1[.]co
 Redirector Type: Short Haul  
 Protocol: HTTPS  
-Traffic profile: profiles/traffic/meterpreter.profile  
+Traffic profile: profiles/traffic/gmail.profile  
 Authentication type: UserAgent Password  
 
 ##### www[.]somedomain2[.]org  
