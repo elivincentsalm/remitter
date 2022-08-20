@@ -17,15 +17,15 @@ Redirectors are simple devices that forward traffic downstream towards the attac
 
 In a maximal setup, each redirector would have it's own domain name and traffic/authentication profile. For example:
 ##### www[.]somedomain1[.]co
-Redirector Type: Short Haul
-Protocol: HTTPS
-Traffic profile: profiles/traffic/meterpreter.profile
-Authentication type: UserAgent Password
+Redirector Type: Short Haul  
+Protocol: HTTPS  
+Traffic profile: profiles/traffic/meterpreter.profile  
+Authentication type: UserAgent Password  
 
-##### www[.]somedomain2[.]org
-Redirector Type: Long Haul
-Protocol: DNS
-Authentication: mTLS
+##### www[.]somedomain2[.]org  
+Redirector Type: Long Haul  
+Protocol: DNS  
+Authentication: mTLS  
 
 #### Laundry Layer
 The laundry layer is only necessary if conducting an internal assessment where there are concerns a member of the blue team will observe traffic from the protected network to/from a redirector. It is another internet-level layer to hide any direct communication to devices also being communicated with via implants.
