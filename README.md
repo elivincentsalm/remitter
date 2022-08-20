@@ -8,22 +8,39 @@ Remitter is a web GUI built to automate deployments of covert C2 infrastructure.
 The above system diagram shows the "maximal" C2 infrastructure that can be created with Remitter. Maximal, meaning meant to display the full capabilities and complexity of Remitter. Components can be removed as desired in configuration settings to reduce complexity, cost, and/or realism. Below contains the rationale for each component in the above system diagram. 
 
 ### Victim Network
-Remitter is not an implant generation framework, though it is designed to be flexible to accomodate different types of implant traffic.
+Remitter is not an implant generation framework, though it is designed to be flexible to accomodate different types of implant traffic. In a maximal setup, many computers will be infected with several persistence methods. 
 
 ### Internet, Mesh Overlay VPN
 
 #### Redirector Layer
 Redirectors are simple devices that forward traffic downstream towards the attack infrastructure using IPTables. Their purpose is to conceal the location of the attack infrastructure from analysts and scanners monitoring inbound/outbound network traffic. If a redirector is discovered, it can easily be torn down (for instance) and replaced without compromising the entire operation.
 
+In a maximal setup, each redirector would have it's own domain name and traffic/authentication profile. For example:
+##### www.moneyneversleeps.co
+Redirector Type: Short Haul
+Protocol: HTTPS
+Traffic profile: profiles/traffic/meterpreter.profile
+Authentication type: UserAgent Password
+
+##### www.travelgrand.org
+Redirector Type: Long Haul
+Protocol: DNS
+Authentication: mTLS
+
 #### Laundry Layer
+The laundry layer is only necessary if conducting an internal assessment where there are concerns a member of the blue team will observe traffic from the protected network to/from a redirector. It is another internet-level layer to hide any direct communication to devices also being communicated with via implants.
 
 ### Protected Operational Network
+Reference to the Vault 7 leaks. Victim should have no idea where this is. 
 
 #### Fingerprint/Cover Server
+If desired, unauthenticated requests can be forwarded to a cover server, where browser fingerprinting is performed. This allows us to reduce suspicion while also achieving a greater understanding of attack surface.
 
 #### Credential Capture Server
+Mobile devices visiting a redirector can be forwarded to a credential capture page. If credentials are entered, those can be forwarded to our attack infrastructure ("Intel").
 
 #### Operations Management Center
+Houses the C2 TeamServer as well as Remitter. 
 
 
 # References
