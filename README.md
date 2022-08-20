@@ -5,7 +5,7 @@ remitter: Automating Covert and Resilient C2 Infrastructure Deployments
 
 
 ## Rationale
-The above system diagram shows the "maximal" C2 infrastructure that can be created with Remitter. Maximal, meaning meant to display the full capabilities and complexity of Remitter. Components can be removed as desired in configuration settings to reduce complexity, cost, and realism. Below contains the rationale for each component in the above system diagram. 
+The above system diagram shows the "maximal" C2 infrastructure that can be created with Remitter. Maximal, meaning meant to display the full capabilities and complexity of Remitter. Components can be removed as desired in configuration settings to reduce complexity, cost, and/or realism. Below contains the rationale for each component in the above system diagram. 
 
 ### Victim Network
 
