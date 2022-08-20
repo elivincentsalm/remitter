@@ -16,13 +16,13 @@ Remitter is not an implant generation framework, though it is designed to be fle
 Redirectors are simple devices that forward traffic downstream towards the attack infrastructure using IPTables. Their purpose is to conceal the location of the attack infrastructure from analysts and scanners monitoring inbound/outbound network traffic. If a redirector is discovered, it can easily be torn down (for instance) and replaced without compromising the entire operation.
 
 In a maximal setup, each redirector would have it's own domain name and traffic/authentication profile. For example:
-##### www.moneyneversleeps.co
+##### www[.]somedomain1[.]co
 Redirector Type: Short Haul
 Protocol: HTTPS
 Traffic profile: profiles/traffic/meterpreter.profile
 Authentication type: UserAgent Password
 
-##### www.travelgrand.org
+##### www[.]somedomain2[.]org
 Redirector Type: Long Haul
 Protocol: DNS
 Authentication: mTLS
