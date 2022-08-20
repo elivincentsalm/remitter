@@ -1,5 +1,5 @@
 # remitter: Automating Covert and Resilient C2 Infrastructure Deployments
-Remitter is a web GUI built to automate deployments of covert C2 infrastructure. Remitter is designed to be extremely easy to configure for teams lacking domain-knowledge and includes many considerations for teams with high compliance/audit requirements.
+Remitter is a web GUI built to automate deployments of covert C2 infrastructure. Remitter is designed to be extremely easy to configure for teams lacking domain-knowledge and includes many considerations for teams with high data-retention and -privacy requirements.
 
 <img width="1367" alt="MaximalC2Infra" src="https://user-images.githubusercontent.com/55160090/185764594-2e958397-9cbe-48b2-88a1-b1110a8c5310.png">
 
