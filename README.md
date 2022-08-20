@@ -3,6 +3,28 @@ remitter: Automating Covert and Resilient C2 Infrastructure Deployments
 
 <img width="1385" alt="MaximalC2Infra" src="https://user-images.githubusercontent.com/55160090/185763146-ad4a336a-7311-4201-9d93-78037c2b7149.png">
 
+
+## Rationale
+
+### Victim Network
+
+#### Implant Layer
+
+### Internet, Mesh Overlay VPN
+
+#### Redirector Layer
+
+#### Laundry Layer
+
+### Protected Operational Network
+
+#### Fingerprint/Cover Server
+
+#### Credential Capture Server
+
+#### Operations Management Center
+
+
 # References
 https://byt3bl33d3r.substack.com/p/taking-the-pain-out-of-c2-infrastructure-3c4
 
