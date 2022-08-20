@@ -27,7 +27,7 @@ Protocol: DNS
 Authentication: mTLS  
 
 #### Laundry Layer
-The laundry layer is only necessary if conducting an internal assessment where there are concerns a member of the blue team will observe traffic from the protected network to/from a redirector. It is another internet-level layer to hide any direct communication to devices also being communicated with via implants.
+High-throughput layer for forwarding all traffic to protected operational network. The laundry layer is only necessary if conducting an internal assessment where there are concerns a member of the blue team will observe traffic from the protected network to/from a redirector. It is another internet-level layer to hide any direct communication to devices also being communicated with via implants.
 
 ### Protected Operational Network
 Reference to the Vault 7 leaks. Victim should have no idea where this is. 
