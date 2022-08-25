@@ -41,6 +41,18 @@ Mobile devices visiting a redirector can be forwarded to a credential capture pa
 #### Operations Management Center
 Houses the C2 TeamServer as well as Remitter. 
 
+## Design Considerations
+
+### Stealth
+The core attack infrastructure must remain hidden to the victim. If the blue team discovers *anything* infrastructure related, it must not compromise the operation. Thus, redirectors are used, laundry layers are possible, and C2 traffic is diverse.
+
+### Operational Resilience
+If a blue team operator blocks egress traffic to a redirector, we want to be able to rotate the blocked redirectors to maintain access. Additionally, all data captured during the operation should be backed-up. 
+
+### Simplicity
+
+
+
 
 # References
 https://byt3bl33d3r.substack.com/p/taking-the-pain-out-of-c2-infrastructure-3c4

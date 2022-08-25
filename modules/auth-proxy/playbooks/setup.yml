@@ -1,0 +1,30 @@
+- become: yes
+  hosts: http-redir 
+  name: http-redir-ubuntu setup
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+
+    - name: Stop nginx
+      service:
+        name: nginx
+        state: stopped
+
+    - name: Replace nginx.conf file
+      copy:
+        src: ../configs/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Create certificates
+      script: ../scripts/create_certs.sh
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
