@@ -137,3 +137,5 @@ keys/*
 keys
 
 notes.txt
+
+*.swp
