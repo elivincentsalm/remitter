@@ -52,7 +52,163 @@ If a blue team operator blocks egress traffic to a redirector, we want to be abl
 ### Simplicity
 
 
+## API Contract
 
+```
+API Contract:
+
+    Config Management:
+    Events and Scripting:
+
+    Engagements:
+        GET /api/v1/engagement/all
+        GET /api/v1/engagement/<id>
+        POST /api/v1/engagement/<id>
+        DELETE /api/v1/engagement/all
+        DELETE /api/v1/engagement/<id>
+    Properties:
+        {
+            "id": "string"
+            "name": "string"
+            "groups": []
+            "implants": []
+            "redirectors": []
+            "laundry": []
+            "proxies": []
+            "certificates": []
+        }
+
+    Domains:
+        GET /api/v1/engagement/<id>/domain/all
+        GET /api/v1/engagement/<id>/domain/<id>
+        POST /api/v1/engagement/<id>/domain/<id>
+        DELETE /api/v1/engagement/<id>/domain/all
+        DELETE /api/v1/engagement/<id>/domain/<id>
+    Properties:
+        {
+            "id": "string"
+            "domain_name": "string"
+            "registrar": "string"
+            "assigned": Boolean
+            "engagement_id": "string"
+        }
+
+    Groups:
+        GET /api/v1/engagement/<id>/group/all
+        GET /api/v1/engagement/<id>/group/<id>
+        POST /api/v1/engagement/<id>/group/<id>
+        POST /api/v1/engagement/<id>/group/<id>/add/<id>
+        DELETE /api/v1/engagement/<id>/group/all
+        DELETE /api/v1/engagement/<id>/group/<id>
+    Properties:
+        {
+            "id": "string"
+            "name": "string"
+            "members": []
+            "engagement_id": "string"
+        }
+
+    Implants:
+        GET /api/v1/engagement/<id>/implant/all
+        GET /api/v1/engagement/<id>/implant/<id>
+        POST /api/v1/engagement/<id>/implant/<id>
+        DELETE /api/v1/engagement/<id>/implant/all
+        DELETE /api/v1/engagement/<id>/implant/<id>
+    Properties:
+        {
+            "id": "string"
+            "name": "string"
+            "profile": "string"
+            "public_ip_address": "string"
+            "status": "string"
+            "redirectors": []
+            "engagement_id": "string"
+        }
+
+    Lighthouses:
+        GET /api/v1/engagement/<id>/lighthouse/all
+        GET /api/v1/engagement/<id>/lighthouse/<id>
+        POST /api/v1/engagement/<id>/lighthouse/<id>
+        DELETE /api/v1/engagement/<id>/lighthouse/all
+        DELETE /api/v1/engagement/<id>/lighthouse/<id>
+    Properties:
+        {
+            "id": "string"
+            "name": "string"
+            "profile": "string"
+            "public_ip_address": "string"
+            "domain_name": "string"
+            "csp": "string"
+            "status": "string"
+            "engagement_id": "string"
+        }
+
+    Redirectors:
+        GET /api/v1/engagement/<id>/redirector/all
+        GET /api/v1/engagement/<id>/redirector/<id>
+        POST /api/v1/engagement/<id>/redirector/<id>
+        DELETE /api/v1/engagement/<id>/redirector/all
+        DELETE /api/v1/engagement/<id>/redirector/<id>
+    Properties:
+        {
+            "id": "string"
+            "name": "string"
+            "profile": "string"
+            "public_ip_address": "string"
+            "domain_name": "string"
+            "csp": "string"
+            "status": "string"
+            "engagement_id": "string"
+        }
+
+    Laundry Layer:
+        GET /api/v1/engagement/<id>/laundry/all
+        GET /api/v1/engagement/<id>/laundry/<id>
+        POST /api/v1/engagement/<id>/laundry/<id>
+        DELETE /api/v1/engagement/<id>/laundry/all
+        DELETE /api/v1/engagement/<id>/laundry/<id>
+    Properties:
+        {
+            "id": "string"
+            "name": "string"
+            "profile": "string"
+            "public_ip_address": "string"
+            "domain_name": "string"
+            "csp": "string"
+            "status": "string"
+            "engagement_id": "string"
+        }
+
+    Proxy Layer:
+        GET /api/v1/engagement/<id>/proxy/all
+        GET /api/v1/engagement/<id>/proxy/<id>
+        POST /api/v1/engagement/<id>/proxy/<id>
+        DELETE /api/v1/engagement/<id>/proxy/all
+        DELETE /api/v1/engagement/<id>/proxy/<id>
+    Properties:
+        {
+            "id": "string"
+            "name": "string"
+            "profile": "string"
+            "public_ip_address": "string"
+            "domain_name": "string"
+            "status": "string"
+            "engagement_id": "string"
+        }
+
+    Certificates:
+        GET /api/v1/engagement/<id>/ca/<id>
+        GET /api/v1/engagement/<id>/certificate/<id>
+    Properties:
+        {
+            "id": "string"
+            "name": "string"
+            "type": "string"
+            "belongs_to": []
+            "common_name": "string"
+            "engagement_id": "string"
+        }
+```
 
 # References
 https://byt3bl33d3r.substack.com/p/taking-the-pain-out-of-c2-infrastructure-3c4
