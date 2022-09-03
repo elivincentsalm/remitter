@@ -1,0 +1,22 @@
+- become: yes
+  hosts: dns-redir 
+  name: dns-redir-ubuntu setup
+  tasks:
+    - name: Install socat
+      apt:
+        name: socat 
+        state: latest
+        update_cache: yes
+
+    - name: Create dns-redir service
+      copy:
+        src: configs/dns-redir.service
+        dest: /etc/systemd/system/dns-redir.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Restart dns-redir service
+      service:
+        name: dns-redir
+        state: restarted
