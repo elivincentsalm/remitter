@@ -41,11 +41,14 @@ def redirectors_handler(redirector_id):
             instances = [serialize(i) for i in list(ec2_resource.instances.all())]
             return instances
         elif request.method=="POST":
-        # minimum required parameters: [type: "http"]
+            # minimum required parameters: [type: "http"]
             create_aws_redirector()
             status = {"status": "error"}
             return status
         elif request.method=="DELETE":
+            # terminate all instances & associated resources
+            # this is way too slow to run without a task queue. even an async request will timeout after 60 seconds
+            delete_aws_redirectors()
             status = {"status": "error"}
             return status
     else:
@@ -69,7 +72,8 @@ def serialize(i):
 # for AWS below, not sure how exactly I will structure this logic
 def create_aws_redirector():
     tx = g.begin()
-    sg = ec2_resource.create_security_group(GroupName="http-redirector", Description="http-redirector")
+    sg_uuid = str(uuid.uuid4())
+    sg = ec2_resource.create_security_group(GroupName=sg_uuid, Description=sg_uuid)
     ec2_client.authorize_security_group_ingress(
             GroupId=sg.id,
             IpPermissions=[
@@ -87,13 +91,12 @@ def create_aws_redirector():
                  'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
             ]
         )
-    group_name = 'http-redirector'
     response = ec2_client.describe_security_groups(
-            Filters=[dict(Name='group-name', Values=[group_name])]
+            Filters=[dict(Name='group-name', Values=[sg_uuid])]
         )
     group_id = response['SecurityGroups'][0]['GroupId']
     
-    fwrule_properties = {"Name": group_name, "RuleId": str(uuid.uuid4()), "NativeRuleId": group_id}
+    fwrule_properties = {"Name": sg_uuid, "RuleId": str(uuid.uuid4()), "NativeRuleId": group_id}
     fwrule_node = Node("FirewallRuleset", **fwrule_properties )
 
     # Create KeyPair
@@ -151,3 +154,15 @@ def configure_aws_redirector(instance):
     pass
 
 
+def delete_aws_redirectors():
+    data = g.run('MATCH (r:Redirector) RETURN DISTINCT r;').data()
+    print(json.dumps(data, indent=4))
+    for r in data:
+        instance_id = r["r"]["InstanceId"]
+        ssh_key = g.run('MATCH (kp:KeyPair)-[]->(r:Redirector {InstanceId: "' + instance_id + '"}) RETURN kp;').data()[0]["kp"]
+        sg = g.run('MATCH (sg:FirewallRuleset)-[]->(r:Redirector {InstanceId: "' + instance_id + '"}) RETURN sg;').data()[0]["sg"]
+        instance = ec2_resource.Instance(instance_id)
+        instance.terminate()
+        instance.wait_until_terminated()
+        ec2_client.delete_key_pair(KeyName=ssh_key["KeyName"])
+        ec2_client.delete_security_group(GroupId=sg["NativeRuleId"])
