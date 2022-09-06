@@ -1,9 +1,16 @@
 import boto3
+import io
 import json
 import os
+import paramiko
+import redis
+import scp
+import time
 import uuid
 from dotenv import load_dotenv, find_dotenv
 from flask import Blueprint, request, abort
+from rq import Connection, Queue 
+from rq.job import Job
 from py2neo import Graph, Node, Relationship
 
 
@@ -28,6 +35,10 @@ ec2_client = boto3.client(
 
 redirectors = Blueprint(name="redirectors", import_name=__name__)
 
+redis_url = "redis://localhost:6379"
+conn = redis.from_url(redis_url)
+q = Queue(connection=conn)
+
 '''
 GET - Get all redirectors
 POST - Create redirector
@@ -38,18 +49,15 @@ DELETE - Delete all redirectors
 def redirectors_handler(redirector_id):
     if redirector_id==None:
         if request.method=="GET":
-            instances = [serialize(i) for i in list(ec2_resource.instances.all())]
+            instances = g.run('MATCH (r:Redirector) RETURN DISTINCT r;').data()
             return instances
         elif request.method=="POST":
-            # minimum required parameters: [type: "http"]
-            create_aws_redirector()
+            job = q.enqueue_call(func=create_aws_redirector)
             status = {"status": "error"}
             return status
         elif request.method=="DELETE":
-            # terminate all instances & associated resources
-            # this is way too slow to run without a task queue. even an async request will timeout after 60 seconds
-            delete_aws_redirectors()
-            status = {"status": "error"}
+            job = q.enqueue_call(func=delete_aws_redirectors)
+            status = {"status": "success"}
             return status
     else:
         if redirector_id=="test":
@@ -59,7 +67,7 @@ def redirectors_handler(redirector_id):
             return serialize(instance)
         elif request.method=="DELETE":
             instance.terminate()
-            
+            return job.get_id()
 
 '''
 GET - Get specific redirector
@@ -110,6 +118,8 @@ def create_aws_redirector():
     del kp_metadata["ResponseMetadata"]
     kp_metadata["KeyPairType"] = "ssh"
     kp_node = Node("KeyPair", **kp_metadata)
+    with open("id_rsa", "w+") as f:
+        f.write(kp_metadata["KeyMaterial"])
     tx.create(kp_node)
 
     # create ec2 instance
@@ -132,31 +142,38 @@ def create_aws_redirector():
         "PrivateIpAddress": instance_metadata["PrivateIpAddress"],
         "State": instance_metadata["State"]["Name"]
     }
-
     redirector_node = Node("Redirector", **redirector_properties)
     ki = Relationship(kp_node, "BELONGS_TO", redirector_node)
     fi = Relationship(fwrule_node, "APPLIES_TO", redirector_node)
-
     tx.create(redirector_node)
     tx.create(ki)
     tx.create(fi)
-
     g.commit(tx)
-    # run configuration script upon completion in background
-    # can do this with rq
-    configure_aws_redirector(instances[0])
 
-
-def configure_aws_redirector(instance):
-    #instance.wait_until_running()
-    # run ansible setup on instance
-    # could just run an os command
-    pass
+    instances[0].wait_until_running()
+    i = ec2_resource.Instance(redirector_properties["InstanceId"])
+    # should put this in a different function, along with the DB queries, because across CSPs this will repeat code
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    pk = paramiko.RSAKey.from_private_key(io.StringIO(kp_metadata['KeyMaterial']))
+    time.sleep(30)
+    client.connect(i.public_ip_address, username='ubuntu', pkey=pk)
+    scp_client = scp.SCPClient(client.get_transport())
+    with open("routes/redirectors/nginx_setup.sh", "r+") as f:
+        for cmd in f.readlines():
+            if cmd[:3]=="SCP":
+                _, src, dest = cmd.split()
+                scp_client.put(src, dest, recursive=True)
+            else:
+                stdin, stdout, stderr = client.exec_command(cmd)
+                exit_status = stdout.channel.recv_exit_status()
+                if exit_status!=0:
+                    print("ERROR: remote command failed")
+                    print(cmd)
 
 
 def delete_aws_redirectors():
     data = g.run('MATCH (r:Redirector) RETURN DISTINCT r;').data()
-    print(json.dumps(data, indent=4))
     for r in data:
         instance_id = r["r"]["InstanceId"]
         ssh_key = g.run('MATCH (kp:KeyPair)-[]->(r:Redirector {InstanceId: "' + instance_id + '"}) RETURN kp;').data()[0]["kp"]
