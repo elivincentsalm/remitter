@@ -5,6 +5,7 @@ import os
 import paramiko
 import redis
 import scp
+import subprocess
 import time
 import uuid
 from dotenv import load_dotenv, find_dotenv
@@ -118,8 +119,6 @@ def create_aws_redirector():
     del kp_metadata["ResponseMetadata"]
     kp_metadata["KeyPairType"] = "ssh"
     kp_node = Node("KeyPair", **kp_metadata)
-    with open("id_rsa", "w+") as f:
-        f.write(kp_metadata["KeyMaterial"])
     tx.create(kp_node)
 
     # create ec2 instance
@@ -183,3 +182,27 @@ def delete_aws_redirectors():
         instance.wait_until_terminated()
         ec2_client.delete_key_pair(KeyName=ssh_key["KeyName"])
         ec2_client.delete_security_group(GroupId=sg["NativeRuleId"])
+
+def configure_nebula(instance):
+    subprocess.run('./nebula/nebula-cert ca -name "BLACKFISH" -out-crt nebula/ca/ca.crt -out-key nebula/ca/ca.key')
+    subprocess.run('./nebula/nebula-cert sign -name "lighthouse" -ip "192.168.100.1" -ca-crt nebula/ca/ca.crt -ca-key nebula/ca/ca.key')
+    subprocess.run('./nebula/nebula-cert sign -name "lp1" -ip "192.168.100.2" -ca-crt nebula/ca/ca.crt -ca-key nebula/ca/ca.key')
+    subprocess.run('./nebula/nebula-cert sign -name "lp2" -ip "192.168.100.3"-ca-crt nebula/ca/ca.crt -ca-key nebula/ca/ca.key')
+    subprocess.run('./nebula/nebula-cert sign -name "lp3" -ip "192.168.100.4" -ca-crt nebula/ca/ca.crt -ca-key nebula/ca/ca.key')
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    pk = paramiko.RSAKey.from_private_key(io.StringIO(kp_metadata['KeyMaterial']))
+    time.sleep(30)
+    client.connect(i.public_ip_address, username='ubuntu', pkey=pk)
+    scp_client = scp.SCPClient(client.get_transport())
+    with open("routes/redirectors/nginx_setup.sh", "r+") as f:
+        for cmd in f.readlines():
+            if cmd[:3]=="SCP":
+                _, src, dest = cmd.split()
+                scp_client.put(src, dest, recursive=True)
+            else:
+                stdin, stdout, stderr = client.exec_command(cmd)
+                exit_status = stdout.channel.recv_exit_status()
+                if exit_status!=0:
+                    print("ERROR: remote command failed")
+                    print(cmd)

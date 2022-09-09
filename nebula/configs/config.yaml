@@ -1,0 +1,21 @@
+static_host_map:
+  "192.168.100.1": ["PUBLIC_IP_LIGHTHOUSE:4242"]
+
+lighthouse:
+  am_lighthouse: false
+  interval: 60
+  hosts:
+    - "192.168.100.1"
+
+firewall:
+  outbound:
+    # Allow all outbound traffic from this node
+    - port: any
+      proto: any
+      host: any
+
+  inbound:
+    # Allow icmp between any nebula hosts
+    - port: any
+      proto: any
+      host: any
